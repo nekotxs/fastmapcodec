@@ -15,7 +15,8 @@ out
 !.idea/scopes
 
 # gradle
-build
+bin/
+build/
 .gradle
 
 # other
