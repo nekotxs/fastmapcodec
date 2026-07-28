@@ -1,0 +1,45 @@
+plugins {
+    id "net.neoforged.moddev" version "2.0.+"
+}
+
+base {
+    archivesName = mod_id + "-neoforge"
+}
+
+// NOTE: check https://projects.neoforged.net/neoforged/moddev-gradle
+// for the current plugin version before first build -- this project
+// evolves quickly and pinning to a stale version is a common source
+// of the very first build failure.
+
+tasks.named('jar', Jar) {
+    manifest {
+        attributes([
+            "Implementation-Version": project.version
+        ])
+    }
+}
+
+neoForge {
+    version = neoforge_version
+
+    mods {
+        fastmapcodec {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Pull Common's Java sources and resources (incl. the mixin config json)
+// directly into this module's compile/resource set, so we don't need to
+// publish Common as a separate artifact. Common is compiled against a
+// different (vanilla) classpath via VanillaGradle, so it's used purely
+// as a source-share here, NOT as a binary `implementation project(...)`
+// dependency -- adding both would double-compile the same classes.
+
+sourceSets.main.java.srcDir project(":common").sourceSets.main.java.srcDirs
+sourceSets.main.resources.srcDir project(":common").sourceSets.main.resources.srcDirs
+
+// If the sourceSet-sharing above doesn't play nicely with your Gradle/
+// moddev version, the simpler fallback is to just duplicate
+// fastmapcodec.mixins.json and the mixin java files directly under
+// NeoForge/src/main -- less elegant, but guaranteed to work.

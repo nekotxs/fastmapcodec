@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.neko.fastmapcodec.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "PlayerAdvancementsDataMixin",
+    "SanityCheckMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
