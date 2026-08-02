@@ -1,66 +1,79 @@
 # fastmapcodec
 
-Fixes O(n^2) behavior in Mojang's `BaseMapCodec` (part of `com.mojang:datafixerupper`,
-used internally by `Codec.unboundedMap`) when decoding large map-based Codecs.
+Fixes TPS stalls on player join caused by large advancement files (and the
+same class of stall anywhere else in the game, or in other mods, that decodes
+a large map through DFU).
+
+Fixes O(N²) behavior in Mojang's `BaseMapCodec` (part of `com.mojang:datafixerupper`)
+when decoding large map-based Codecs. Since the fix lives in `BaseMapCodec` itself,
+it applies to every codec built on top of it -- `UnboundedMapCodec`,
+`SimpleMapCodec`, and anything else sharing the same `decode`/`encode` logic --
+not just player advancements.
+
+Versions affected: 1.21 and higher.
+
+Upstream PR: [Mojang/DataFixerUpper#110](https://github.com/Mojang/DataFixerUpper/pull/110)
+Benchmarks: [nekotxs/BaseMapCodec-bench](https://github.com/nekotxs/BaseMapCodec-bench)
 
 ## Background
 
-`BaseMapCodec.decode` accumulates decoded entries into an `Object2ObjectArrayMap`
-(fastutil), which is backed by two parallel arrays and does a **linear scan**
-on every `putIfAbsent`. Building a map of N entries this way costs O(N^2)
-total comparisons. This is a reasonable choice for the small maps (a handful
-of fields) that make up most Codec usage in vanilla -- but nothing bounds the
-map size, and large player-controlled data can hit N in the tens of thousands.
+Since [e0b245e](https://github.com/Mojang/DataFixerUpper/commit/e0b245ea8e5a8e86b0ac7aedc0cb3f260ad6c6bc),
+`BaseMapCodec.decode()` accumulates entries into an `Object2ObjectArrayMap`,
+which does a linear scan on every insert -- O(N²) total for N entries. Fine
+for the small maps that make up most Codec usage in vanilla, but nothing
+bounds N, and large player-controlled data (e.g. a heavily modded
+advancement tree) can push it into the tens of thousands, costing seconds of
+main-thread stall on join.
 
-Confirmed real-world trigger: `PlayerAdvancements.load`, on a modpack with
-~220 mods generating ~23,700 advancement entries per player, this cost
-several seconds of main-thread stall on every join
-(`ServerboundFinishConfigurationPacket.handle -> PlayerList.getPlayerForLogin
--> ServerPlayer.<init> -> PlayerAdvancements.load -> ... -> BaseMapCodec.decode`).
-
-This mod replaces the accumulator with `Object2ObjectOpenHashMap`
-(O(1) amortized insertion), preserving the original duplicate-key /
-partial-error-handling semantics verbatim.
+The fix: try `ImmutableMap.Builder.buildOrThrow()` first (fastest at every N
+in benchmarks); on failure (duplicate key -- rare, ~0.004% of calls on a
+modded server, unobserved on vanilla), fall back to
+`Object2ObjectOpenHashMap` to recover partial results. Preserves the
+original duplicate-key / partial-error-handling semantics verbatim. Full
+methodology and comparison against alternatives in the bench repo linked above.
 
 ## Structure
 
-- `Common/` -- loader-independent code (the mixin itself), compiled against
-  vanilla Minecraft via VanillaGradle. No loader API is used anywhere here.
-- `NeoForge/` -- NeoForge loader glue (mod metadata, mixin registration,
-  empty `@Mod` entry point). Pulls in Common's sources directly.
+- `common/` -- loader-independent code (the mixin itself), compiled against
+  vanilla Minecraft via ModDevGradle's vanilla mode. No loader API used.
+- `neoforge/` -- NeoForge loader glue, split into two source sets:
+  - `main` -- an early `ITransformationService` + `IModFileCandidateLocator`
+    that migrates `datafixerupper` from ModLauncher's BOOT module layer into
+    the GAME layer. Needed because NeoForge's layered `ModuleLayerHandler`
+    never exposes boot-layer modules to Mixin's `TransformingClassLoader` --
+    without this, mixins targeting DFU classes silently never apply.
+    Technique adapted from [Sinytra/Connector](https://github.com/Sinytra/Connector)
+    (LGPL-3.0-only), which performs the same migration for `com.mojang:authlib`.
+    Includes a guard against double-migration if another mod (e.g. Connector
+    itself) performs the same operation.
+  - `mod` -- the actual mod: `@Mod` entry point, `neoforge.mods.toml`, mixin
+    config. Packaged as a jar-in-jar, since the `main` jar is consumed early
+    by ModLauncher and excluded from FML's normal mods-folder scan.
+- `fabric/` -- Fabric loader glue. Fabric's Knot loader has no BOOT/GAME
+  layer split, so a direct mixin on `BaseMapCodec` applies as-is, no
+  module-layer migration needed.
 
-Additional loaders (Fabric, Forge) can be added as sibling modules under the
-root, each pulling in `Common`'s sources the same way `NeoForge/` does --
-`Common` itself never needs to change.
+Forge can be added as a sibling module the same way, pulling in `common`'s
+sources directly.
 
 ## Building
 
-```
-./gradlew :NeoForge:build
-```
+./gradlew :neoforge:clean :neoforge:jar # neoforge/build/libs/
+./gradlew :fabric:build # fabric/build/libs/
 
-Output jar: `NeoForge/build/libs/`
 
-First build will likely need a couple of iterations to pin exact working
-versions of the `net.neoforged.moddev` and `org.spongepowered.gradle.vanilla`
-plugins -- check their respective plugin portal pages for current versions
-before Common/NeoForge Gradle sync succeeds.
+## Installing
 
-## Testing
+Drop the built jar into `mods/`. NeoForge: a single jar (contains the
+embedded mod jar internally, nothing else needed alongside it).
 
-1. Drop the built jar into `mods/`.
-2. Repeat the original repro: join with a large (multi-MB) `world/advancements/<uuid>.json`.
-3. Profile with Spark using a TICKED aggregator to isolate the slow tick:
-   ```
-   /spark profiler start --thread * --only-ticks-over 200
-   ```
-4. Confirm the `Object2ObjectArrayMap.findKey -> Objects.equals` hotspot in
-   `Server thread` self-time is gone (or reduced to a linear-cost sliver).
+## License / attribution
 
-## Status
+The `decode()` implementation adapts code from
+`com.mojang.serialization.codecs.BaseMapCodec` in
+[Mojang/DataFixerUpper](https://github.com/Mojang/DataFixerUpper), MIT-licensed.
 
-- [x] Core fix implemented (simple hash-map swap)
-- [ ] Benchmarked against baseline (unpatched) and against a size-adaptive
-      hybrid variant (array map below some threshold N, hash map above)
-- [ ] Fabric / Forge modules
-- [ ] Upstream PR to Mojang/DataFixerUpper
+`neoforge/src/main/java/.../service/ModuleLayerMigrator.java`,
+`FastMapCodecModLocator.java`, and `ConnectorUtil.java` adapt code from
+[Sinytra/Connector](https://github.com/Sinytra/Connector), licensed under
+LGPL-3.0-only.

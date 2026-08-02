@@ -59,9 +59,6 @@ public class ModuleLayerMigrator {
             ModuleDescriptor desc = actualModule.getDescriptor();
             DESCRIPTOR_PACKAGES_FIELD.set(desc, Set.of());
 
-            LOGGER.warn("DEBUG: after mutation, actualModule identityHash={} packages.size()={}",
-                    System.identityHashCode(actualModule), actualModule.getDescriptor().packages().size());
-
             LOGGER.info("Successfully made module {} transformable", moduleName);
             return new SimpleSecureJar(provider);
         } catch (Throwable t) {
@@ -94,15 +91,11 @@ public class ModuleLayerMigrator {
             ModuleLayer bootLayer = layerManager.getLayer(IModuleLayerManager.Layer.BOOT).orElseThrow();
             Module module = bootLayer.findModule(moduleName).orElse(null);
             if (module == null) {
-                LOGGER.warn("DEBUG: module {} not found in BOOT layer at all", moduleName);
                 return false;
             }
             var packages = module.getDescriptor().packages();
-            LOGGER.warn("DEBUG: module {} identityHash={} packages.size()={} packages={}",
-                    moduleName, System.identityHashCode(module), packages.size(), packages);
             return packages.isEmpty();
         } catch (Throwable t) {
-            LOGGER.error("Error checking if module {} is already transformable", moduleName, t);
             return false;
         }
     }

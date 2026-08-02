@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "fastmapcodec",
-  "version": "0.1.0-probe",
-  "name": "FastMapCodec Probe",
-  "description": "Diagnostic probe: does Mixin reach UnboundedMapCodec on Fabric?",
+  "version": "1.0.0",
+  "name": "FastMapCodec",
+  "description": "Fixes O(n^2) in BaseMapCodec.decode (TPS stalls on player join mainly)",
   "authors": ["neko"],
   "license": "MIT",
   "environment": "*",
@@ -17,7 +17,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.15.0",
-    "minecraft": "~1.21.1",
+    "minecraft": ">=1.21",
     "java": ">=21"
   }
 }

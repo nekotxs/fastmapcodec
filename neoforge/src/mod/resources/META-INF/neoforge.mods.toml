@@ -6,11 +6,9 @@ issueTrackerURL = "https://github.com/YOUR_USERNAME/fastmapcodec/issues"
 [[mods]]
 modId = "fastmapcodec"
 version = "${file.jarVersion}"
-displayName = "Fast Map Codec"
+displayName = "FastMapCodec"
 description = '''
-Fixes O(n^2) behavior in Mojang's BaseMapCodec (DataFixerUpper) when decoding
-large map-based Codecs (e.g. player advancements). Replaces the internal
-Object2ObjectArrayMap accumulator with a hashed Object2ObjectOpenHashMap.
+Fixes O(n^2) in BaseMapCodec.decode (TPS stalls on player join mainly)
 '''
 
 [[mixins]]
@@ -26,6 +24,6 @@ config = "fastmapcodec.mixins.json"
 [[dependencies.fastmapcodec]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[1.21.1,1.22)"
+    versionRange = "[1.21.1,)"
     ordering = "NONE"
     side = "BOTH"
