@@ -32,34 +32,11 @@ modded server, unobserved on vanilla), fall back to
 original duplicate-key / partial-error-handling semantics verbatim. Full
 methodology and comparison against alternatives in the bench repo linked above.
 
-## Structure
-
-- `common/` -- loader-independent code (the mixin itself), compiled against
-  vanilla Minecraft via ModDevGradle's vanilla mode. No loader API used.
-- `neoforge/` -- NeoForge loader glue, split into two source sets:
-  - `main` -- an early `ITransformationService` + `IModFileCandidateLocator`
-    that migrates `datafixerupper` from ModLauncher's BOOT module layer into
-    the GAME layer. Needed because NeoForge's layered `ModuleLayerHandler`
-    never exposes boot-layer modules to Mixin's `TransformingClassLoader` --
-    without this, mixins targeting DFU classes silently never apply.
-    Technique adapted from [Sinytra/Connector](https://github.com/Sinytra/Connector)
-    (LGPL-3.0-only), which performs the same migration for `com.mojang:authlib`.
-    Includes a guard against double-migration if another mod (e.g. Connector
-    itself) performs the same operation.
-  - `mod` -- the actual mod: `@Mod` entry point, `neoforge.mods.toml`, mixin
-    config. Packaged as a jar-in-jar, since the `main` jar is consumed early
-    by ModLauncher and excluded from FML's normal mods-folder scan.
-- `fabric/` -- Fabric loader glue. Fabric's Knot loader has no BOOT/GAME
-  layer split, so a direct mixin on `BaseMapCodec` applies as-is, no
-  module-layer migration needed.
-
-Forge can be added as a sibling module the same way, pulling in `common`'s
-sources directly.
 
 ## Building
 
-./gradlew :neoforge:clean :neoforge:jar # neoforge/build/libs/
-./gradlew :fabric:build # fabric/build/libs/
+./gradlew neoforge:build # neoforge/build/libs/
+./gradlew fabric:build # fabric/build/libs/
 
 
 ## Installing
