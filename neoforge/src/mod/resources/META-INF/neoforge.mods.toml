@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
 license = "MIT"
-issueTrackerURL = "https://github.com/YOUR_USERNAME/fastmapcodec/issues"
+issueTrackerURL = "https://github.com/nekotxs/fastmapcodec/issues"
 
 [[mods]]
 modId = "fastmapcodec"
@@ -17,13 +17,13 @@ config = "fastmapcodec.mixins.json"
 [[dependencies.fastmapcodec]]
     modId = "neoforge"
     type = "required"
-    versionRange = "[21.1,)"
+    versionRange = "[21.0,)"
     ordering = "NONE"
     side = "BOTH"
 
 [[dependencies.fastmapcodec]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[1.21.1,)"
+    versionRange = "[1.21,)"
     ordering = "NONE"
     side = "BOTH"
