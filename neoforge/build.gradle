@@ -6,40 +6,65 @@ base {
     archivesName = mod_id + "-neoforge"
 }
 
-// NOTE: check https://projects.neoforged.net/neoforged/moddev-gradle
-// for the current plugin version before first build -- this project
-// evolves quickly and pinning to a stale version is a common source
-// of the very first build failure.
-
-tasks.named('jar', Jar) {
-    manifest {
-        attributes([
-            "Implementation-Version": project.version
-        ])
-    }
+sourceSets {
+    mod
 }
+
+// "mod" = настоящий игровой мод (@Mod-класс + шаренные ресурсы/миксины из common).
+// "main" (default sourceSet) = ITransformationService + Locator, грузится ДО
+// игрового слоя -- намеренно без NeoForge/Minecraft classpath вообще.
+sourceSets.mod.java.srcDir project(":common").sourceSets.main.java.srcDirs
+sourceSets.mod.resources.srcDir project(":common").sourceSets.main.resources.srcDirs
 
 neoForge {
     version = neoforge_version
 
+    // Без этой строки sourceSets.mod компилируется практически без classpath'а --
+    // именно она подключает Minecraft/NeoForge/Mixin API к "изолированному"
+    // (не extends main) сорсету. См. документацию ModDevGradle: "Isolated Source Sets".
+    addModdingDependenciesTo sourceSets.mod
+
     mods {
         fastmapcodec {
-            sourceSet sourceSets.main
+            sourceSet sourceSets.mod
         }
     }
 }
 
-// Pull Common's Java sources and resources (incl. the mixin config json)
-// directly into this module's compile/resource set, so we don't need to
-// publish Common as a separate artifact. Common is compiled against a
-// different (vanilla) classpath via VanillaGradle, so it's used purely
-// as a source-share here, NOT as a binary `implementation project(...)`
-// dependency -- adding both would double-compile the same classes.
+dependencies {
+    // main (service): ТОЛЬКО ModLauncher API.
+    compileOnly "cpw.mods:modlauncher:11.0.5"
+    compileOnly "cpw.mods:securejarhandler:3.0.8" // TODO: свериться с фактической версией
+}
 
-sourceSets.main.java.srcDir project(":common").sourceSets.main.java.srcDirs
-sourceSets.main.resources.srcDir project(":common").sourceSets.main.resources.srcDirs
+// --- Jar-in-jar: собираем "mod" отдельным jar'ом. Имя включает версию --
+// FastMapCodecModLocator ищет его внутри META-INF/jarjar/ по
+// префиксу/суффиксу ("fastmapcodec-" / "-mod.jar"), а не по точному имени.
+tasks.register('modJar', Jar) {
+    archiveFileName = "fastmapcodec-${project.version}-mod.jar"
+    from sourceSets.mod.output
+    manifest {
+        attributes(["Implementation-Version": project.version])
+    }
+}
 
-// If the sourceSet-sharing above doesn't play nicely with your Gradle/
-// moddev version, the simpler fallback is to just duplicate
-// fastmapcodec.mixins.json and the mixin java files directly under
-// NeoForge/src/main -- less elegant, but guaranteed to work.
+// Кладёт modJar как обычный файл внутрь service-jar'а (main), в
+// META-INF/jarjar/. Это НЕ штатный jarJar-DSL NeoForge -- та машинерия
+// существует для FML-шного JarInJarDependencyLocator, который этот jar
+// никогда не увидит (сервисный jar с самого начала не проходит обычный скан
+// модов -- в этом и была вся проблема). Нам нужно просто физически положить
+// байты вложенного jar'а куда-то внутрь внешнего, откуда наш собственный
+// Locator их вручную достанет через "jij:"-схему.
+tasks.named('jar', Jar) {
+    dependsOn tasks.named('modJar')
+    into('META-INF/jarjar') {
+        from tasks.named('modJar')
+    }
+    manifest {
+        attributes(["Implementation-Version": project.version])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

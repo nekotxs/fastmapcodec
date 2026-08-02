@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "fastmapcodec",
+  "version": "0.1.0-probe",
+  "name": "FastMapCodec Probe",
+  "description": "Diagnostic probe: does Mixin reach UnboundedMapCodec on Fabric?",
+  "authors": ["neko"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.neko.fastmapcodec.FastMapCodecFabric"
+    ]
+  },
+  "mixins": [
+    "fastmapcodec.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}
