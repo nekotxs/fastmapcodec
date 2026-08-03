@@ -89,5 +89,6 @@ publishMods {
             start = "1.21"
             end = "26.2"
         }
+        javaVersions.add(JavaVersion.VERSION_21)
     }
 }
