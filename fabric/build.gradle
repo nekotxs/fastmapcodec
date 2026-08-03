@@ -90,5 +90,7 @@ publishMods {
             end = "26.2"
         }
         javaVersions.add(JavaVersion.VERSION_21)
+        client = true
+        server = true
     }
 }
