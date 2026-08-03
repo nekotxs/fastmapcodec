@@ -1,3 +1,5 @@
+evaluationDependsOn(":neoforge")
+
 plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'maven-publish'
