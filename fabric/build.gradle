@@ -1,9 +1,9 @@
-evaluationDependsOn(":neoforge")
-
 plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
+
+evaluationDependsOn(":neoforge")
 
 version = project.mod_version
 group = project.mod_group
