@@ -35,8 +35,10 @@ methodology and comparison against alternatives in the bench repo linked above.
 
 ## Building
 
-./gradlew neoforge:build # neoforge/build/libs/
-./gradlew fabric:build # fabric/build/libs/
+```
+./gradlew neoforge:build   # neoforge/build/libs/
+./gradlew fabric:build     # fabric/build/libs/
+```
 
 ## License / attribution
 
