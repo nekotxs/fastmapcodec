@@ -38,12 +38,6 @@ methodology and comparison against alternatives in the bench repo linked above.
 ./gradlew neoforge:build # neoforge/build/libs/
 ./gradlew fabric:build # fabric/build/libs/
 
-
-## Installing
-
-Drop the built jar into `mods/`. NeoForge: a single jar (contains the
-embedded mod jar internally, nothing else needed alongside it).
-
 ## License / attribution
 
 The `decode()` implementation adapts code from
