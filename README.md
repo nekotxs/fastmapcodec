@@ -48,5 +48,4 @@ The `decode()` implementation adapts code from
 
 `neoforge/src/main/java/.../service/ModuleLayerMigrator.java`,
 `FastMapCodecModLocator.java`, and `ConnectorUtil.java` adapt code from
-[Sinytra/Connector](https://github.com/Sinytra/Connector), licensed under
-LGPL-3.0-only.
+[Sinytra/Connector](https://github.com/Sinytra/Connector), MIT-licensed
