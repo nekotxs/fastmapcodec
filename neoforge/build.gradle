@@ -68,3 +68,19 @@ tasks.named('jar', Jar) {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+apply plugin: "me.modmuss50.mod-publish-plugin"
+
+publishMods {
+    file = tasks.named('jar').flatMap { it.archiveFile }
+    changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
+    type = STABLE
+    modLoaders.add("neoforge")
+    dryRun = !providers.environmentVariable("CI").isPresent()
+
+    github {
+        repository = "nekotxs/fastmapcodec"
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        commitish = "main"
+    }
+}

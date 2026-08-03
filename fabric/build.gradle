@@ -59,3 +59,19 @@ jar {
         rename { "${it}_${project.mod_id}" }
     }
 }
+
+apply plugin: "me.modmuss50.mod-publish-plugin"
+
+publishMods {
+    file = tasks.named('remapJar').flatMap { it.archiveFile } // у fabric обычно remapJar, не jar -- проверь актуальное имя таска
+    changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
+    type = STABLE
+    modLoaders.add("fabric")
+    dryRun = !providers.environmentVariable("CI").isPresent()
+
+    github {
+        repository = "nekotxs/fastmapcodec"
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        commitish = "main"
+    }
+}
