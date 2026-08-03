@@ -74,4 +74,20 @@ publishMods {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         commitish = "main"
     }
+    modrinth {
+            projectId = "CN7axcWy"
+            accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+            minecraftVersionRange {
+                start = "1.21"
+                end = "26.2"
+            }
+    }
+    curseforge {
+        projectId = "1637069" // тот же ID проекта, что у neoforge-версии
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersionRange {
+            start = "1.21"
+            end = "26.2"
+        }
+    }
 }
