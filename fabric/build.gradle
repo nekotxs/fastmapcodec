@@ -73,6 +73,8 @@ publishMods {
         repository = "nekotxs/fastmapcodec"
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         commitish = "main"
+
+        parent(project(":neoforge").tasks.named("publishGithub"))
     }
     modrinth {
             projectId = "CN7axcWy"
