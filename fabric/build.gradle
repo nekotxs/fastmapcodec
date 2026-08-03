@@ -85,6 +85,8 @@ publishMods {
                 start = "1.21"
                 end = "26.2"
             }
+            client = true
+            server = true
     }
     curseforge {
         projectId = "1637069" // тот же ID проекта, что у neoforge-версии

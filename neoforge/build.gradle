@@ -85,12 +85,12 @@ publishMods {
     }
 
     modrinth {
-            projectId = "CN7axcWy"
-            accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-            minecraftVersionRange {
-                start = "1.21"
-                end = "26.2"
-            }
+        projectId = "CN7axcWy"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersionRange {
+            start = "1.21"
+            end = "26.2"
+        }
     }
 
     curseforge {
