@@ -61,6 +61,7 @@ jar {
 apply plugin: "me.modmuss50.mod-publish-plugin"
 
 publishMods {
+    displayName = "FastMapCodec ${project.version}"
     file = tasks.named('remapJar').flatMap { it.archiveFile } // у fabric обычно remapJar, не jar -- проверь актуальное имя таска
     changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
     type = STABLE
