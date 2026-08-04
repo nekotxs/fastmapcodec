@@ -8,6 +8,7 @@ modId = "fastmapcodec"
 version = "${file.jarVersion}"
 authors="nekotxs"
 logoFile="icon.png"
+logoBlur=false
 displayName = "FastMapCodec"
 displayURL="https://github.com/nekotxs/fastmapcodec"
 description = '''
