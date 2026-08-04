@@ -10,18 +10,12 @@ sourceSets {
     mod
 }
 
-// "mod" = настоящий игровой мод (@Mod-класс + шаренные ресурсы/миксины из common).
-// "main" (default sourceSet) = ITransformationService + Locator, грузится ДО
-// игрового слоя -- намеренно без NeoForge/Minecraft classpath вообще.
 sourceSets.mod.java.srcDir project(":common").sourceSets.main.java.srcDirs
 sourceSets.mod.resources.srcDir project(":common").sourceSets.main.resources.srcDirs
 
 neoForge {
     version = neoforge_version
 
-    // Без этой строки sourceSets.mod компилируется практически без classpath'а --
-    // именно она подключает Minecraft/NeoForge/Mixin API к "изолированному"
-    // (не extends main) сорсету. См. документацию ModDevGradle: "Isolated Source Sets".
     addModdingDependenciesTo sourceSets.mod
 
     mods {
@@ -37,9 +31,6 @@ dependencies {
     compileOnly "cpw.mods:securejarhandler:3.0.8" // TODO: свериться с фактической версией
 }
 
-// --- Jar-in-jar: собираем "mod" отдельным jar'ом. Имя включает версию --
-// FastMapCodecModLocator ищет его внутри META-INF/jarjar/ по
-// префиксу/суффиксу ("fastmapcodec-" / "-mod.jar"), а не по точному имени.
 tasks.register('modJar', Jar) {
     archiveFileName = "fastmapcodec-${project.version}-mod.jar"
     from sourceSets.mod.output
@@ -48,15 +39,12 @@ tasks.register('modJar', Jar) {
     }
 }
 
-// Кладёт modJar как обычный файл внутрь service-jar'а (main), в
-// META-INF/jarjar/. Это НЕ штатный jarJar-DSL NeoForge -- та машинерия
-// существует для FML-шного JarInJarDependencyLocator, который этот jar
-// никогда не увидит (сервисный jar с самого начала не проходит обычный скан
-// модов -- в этом и была вся проблема). Нам нужно просто физически положить
-// байты вложенного jar'а куда-то внутрь внешнего, откуда наш собственный
-// Locator их вручную достанет через "jij:"-схему.
 tasks.named('jar', Jar) {
     dependsOn tasks.named('modJar')
+    from(sourceSets.mod.resources.srcDirs) {
+        include 'META-INF/neoforge.mods.toml'
+        include 'icon.png'
+    }
     into('META-INF/jarjar') {
         from tasks.named('modJar')
     }

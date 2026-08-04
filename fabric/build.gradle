@@ -13,7 +13,7 @@ base {
 }
 
 repositories {
-    // Loom already adds the essential Fabric/Mojang repositories.
+
 }
 
 sourceSets {
@@ -31,10 +31,6 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    // Deliberately no fabric-api dependency -- this is a minimal probe,
-    // we only need fabric-loader (ModInitializer) and Mixin (bundled
-    // with fabric-loader itself, not a separate dependency here).
 }
 
 processResources {

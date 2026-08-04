@@ -3,7 +3,7 @@
   "id": "fastmapcodec",
   "version": "1.0.0",
   "name": "FastMapCodec",
-  "description": "Fixes O(n^2) in BaseMapCodec.decode (TPS stalls on player join mainly)",
+  "description": "Fixes O(n^2) in BaseMapCodec.decode (TPS freezes on player join mainly)",
   "authors": ["neko"],
   "license": "MIT",
   "environment": "*",

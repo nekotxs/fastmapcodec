@@ -6,9 +6,12 @@ issueTrackerURL = "https://github.com/nekotxs/fastmapcodec/issues"
 [[mods]]
 modId = "fastmapcodec"
 version = "${file.jarVersion}"
+authors="nekotxs"
+logoFile="icon.png"
 displayName = "FastMapCodec"
+displayURL="https://github.com/nekotxs/fastmapcodec"
 description = '''
-Fixes O(n^2) in BaseMapCodec.decode (TPS stalls on player join mainly)
+Fixes O(n^2) in BaseMapCodec.decode (TPS freezes on player join mainly)
 '''
 
 [[mixins]]
