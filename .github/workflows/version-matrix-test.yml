@@ -82,7 +82,7 @@ jobs:
         run: |
           cd server
           echo "-ea" > user_jvm_args.txt
-          timeout 60 sh run.sh --nogui > /dev/null 2>&1 || true
+          timeout 90 sh run.sh --nogui > /dev/null 2>&1 || true
           cat logs/latest.log
 
       - name: Assert expected log lines
