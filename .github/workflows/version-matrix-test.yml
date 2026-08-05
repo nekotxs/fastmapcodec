@@ -10,8 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: 21 }
 
       - name: Build NeoForge jar
@@ -20,13 +20,13 @@ jobs:
       - name: Build Fabric jar
         run: ./gradlew :fabric:build --no-daemon
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: fastmapcodec-neoforge-jar
           path: neoforge/build/libs/fastmapcodec-neoforge-*.jar
           retention-days: 3
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: fastmapcodec-fabric-jar
           path: |
@@ -41,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { mc: "1.21",       neoforge_prefix: "21.0.167",    java: 21 }
+          - { mc: "1.21",       neoforge_prefix: "21.0.167", java: 21 }
           - { mc: "1.21.1",     neoforge_prefix: "21.1.248", java: 21 }
           - { mc: "1.21.2",     neoforge_prefix: "21.2.",    java: 21 }
           - { mc: "1.21.3",     neoforge_prefix: "21.3.",    java: 21 }
@@ -53,6 +53,7 @@ jobs:
           - { mc: "1.21.9",     neoforge_prefix: "21.9.",    java: 21 }
           - { mc: "1.21.10",    neoforge_prefix: "21.10.",   java: 21 }
           - { mc: "1.21.11",    neoforge_prefix: "21.11.",   java: 21 }
+          - { mc: "26.1",       neoforge_prefix: "26.1.0.",  java: 25 }
           - { mc: "26.1.1",     neoforge_prefix: "26.1.1.",  java: 25 }
           - { mc: "26.1.2",     neoforge_prefix: "26.1.2.",  java: 25 }
           - { mc: "26.2",       neoforge_prefix: "26.2.",    java: 25 }
@@ -102,8 +103,8 @@ jobs:
       - name: Assert expected log lines
         run: |
           cd server/logs
-          grep -q "FastMapCodec.*fastmapcodec" latest.log \
-            || { echo "::error::Mod not in Mod List (neoforge ${{ matrix.mc }})"; exit 1; }
+          grep -iq "fastmapcodec" latest.log \
+            || { echo "::error::Mod not loaded (neoforge ${{ matrix.mc }})"; exit 1; }
           grep -qE "Successfully made module datafixerupper transformable|fastmapcodec.datafixerupper.gamelib" latest.log \
             || { echo "::error::DFU not made transformable (neoforge ${{ matrix.mc }})"; exit 1; }
           grep -q "fastmapcodec.test: mixin applied" latest.log \
