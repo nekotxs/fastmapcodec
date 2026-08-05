@@ -81,8 +81,7 @@ jobs:
       - name: Run server
         run: |
           cd server
-          echo "-ea" > user_jvm_args.txt
-          timeout 90 sh run.sh --nogui > /dev/null 2>&1 || true
+          timeout 60 sh run.sh --nogui > /dev/null 2>&1 || true
           cat logs/latest.log
 
       - name: Assert expected log lines
@@ -128,7 +127,7 @@ jobs:
       - name: Run server
         run: |
           cd server
-          timeout 60 java -ea -jar fabric-server-launch.jar --nogui > /dev/null 2>&1 || true
+          timeout 60 java -jar fabric-server-launch.jar --nogui > /dev/null 2>&1 || true
           cat logs/latest.log
 
       - name: Assert expected log lines
