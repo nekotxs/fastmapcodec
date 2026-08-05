@@ -26,7 +26,6 @@ neoForge {
 }
 
 dependencies {
-    // main (service): ТОЛЬКО ModLauncher API.
     compileOnly "cpw.mods:modlauncher:11.0.5"
     compileOnly "cpw.mods:securejarhandler:3.0.8" // TODO: свериться с фактической версией
 }

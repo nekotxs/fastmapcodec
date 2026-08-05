@@ -62,7 +62,7 @@ apply plugin: "me.modmuss50.mod-publish-plugin"
 
 publishMods {
     displayName = "FastMapCodec ${project.version}"
-    file = tasks.named('remapJar').flatMap { it.archiveFile } // у fabric обычно remapJar, не jar -- проверь актуальное имя таска
+    file = tasks.named('remapJar').flatMap { it.archiveFile }
     changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
     type = STABLE
     modLoaders.add("fabric")
@@ -84,7 +84,7 @@ publishMods {
         }
     }
     curseforge {
-        projectId = "1637069" // тот же ID проекта, что у neoforge-версии
+        projectId = "1637069"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         minecraftVersionRange {
             start = "1.21"
