@@ -10,10 +10,9 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
 import com.mojang.serialization.codecs.BaseMapCodec;
+import dev.neko.fastmapcodec.tests.TestMixinBaseMapCodec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.List;
