@@ -5,7 +5,7 @@ plugins {
 
 evaluationDependsOn(":neoforge")
 
-version = project.mod_version
+version = project.version
 group = project.mod_group
 
 base {
@@ -61,7 +61,7 @@ jar {
 apply plugin: "me.modmuss50.mod-publish-plugin"
 
 publishMods {
-    displayName = "FastMapCodec ${project.version}"
+    displayName = "FastMapCodec Fabric ${project.version}"
     file = tasks.named('remapJar').flatMap { it.archiveFile }
     changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
     type = STABLE
