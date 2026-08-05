@@ -81,7 +81,8 @@ jobs:
       - name: Run server
         run: |
           cd server
-          JAVA_TOOL_OPTIONS="-ea" timeout 60 sh run.sh --nogui > /dev/null 2>&1 || true
+          echo "-ea" > user_jvm_args.txt
+          timeout 60 sh run.sh --nogui > /dev/null 2>&1 || true
           cat logs/latest.log
 
       - name: Assert expected log lines
