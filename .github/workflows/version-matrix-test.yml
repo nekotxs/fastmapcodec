@@ -42,9 +42,11 @@ jobs:
         include:
           - { mc: "1.21",       neoforge_prefix: "21.0.",   java: 21 }
           - { mc: "1.21.1",     neoforge_prefix: "21.1.",   java: 21 }
+          - { mc: "1.21.2",     neoforge_prefix: "21.2.",   java: 21 }
           - { mc: "1.21.3",     neoforge_prefix: "21.3.",   java: 21 }
           - { mc: "1.21.4",     neoforge_prefix: "21.4.",   java: 21 }
           - { mc: "1.21.5",     neoforge_prefix: "21.5.",   java: 21 }
+          - { mc: "1.21.6",     neoforge_prefix: "21.6.",   java: 21 }
           - { mc: "1.21.7",     neoforge_prefix: "21.7.",   java: 21 }
           - { mc: "1.21.8",     neoforge_prefix: "21.8.",   java: 21 }
           - { mc: "1.21.9",     neoforge_prefix: "21.9.",   java: 21 }
@@ -112,12 +114,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { mc: "1.21",       java: 21 }
           - { mc: "1.21.1",     java: 21 }
           - { mc: "1.21.2",     java: 21 }
           - { mc: "1.21.3",     java: 21 }
           - { mc: "1.21.4",     java: 21 }
           - { mc: "1.21.5",     java: 21 }
+          - { mc: "1.21.6",     java: 21 }
           - { mc: "1.21.7",     java: 21 }
           - { mc: "1.21.8",     java: 21 }
           - { mc: "1.21.9",     java: 21 }
@@ -127,7 +129,6 @@ jobs:
           - { mc: "26.1.1",     java: 25 }
           - { mc: "26.1.2",     java: 25 }
           - { mc: "26.2",       java: 25 }
-
     steps:
       - uses: actions/download-artifact@v4
         with:
