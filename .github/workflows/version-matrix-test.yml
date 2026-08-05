@@ -1,0 +1,164 @@
+name: Version Matrix Test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+
+      - name: Build NeoForge jar
+        run: ./gradlew :neoforge:jar --no-daemon
+
+      - name: Build Fabric jar
+        run: ./gradlew :fabric:build --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fastmapcodec-neoforge-jar
+          path: neoforge/build/libs/fastmapcodec-neoforge-*.jar
+          retention-days: 3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fastmapcodec-fabric-jar
+          path: |
+            fabric/build/libs/fastmapcodec-fabric-*.jar
+            !fabric/build/libs/*-sources.jar
+          retention-days: 3
+
+  test-neoforge:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: "1.21",       neoforge_prefix: "21.0.",   java: 21 }
+          - { mc: "1.21.1",     neoforge_prefix: "21.1.",   java: 21 }
+          - { mc: "1.21.3",     neoforge_prefix: "21.3.",   java: 21 }
+          - { mc: "1.21.4",     neoforge_prefix: "21.4.",   java: 21 }
+          - { mc: "1.21.5",     neoforge_prefix: "21.5.",   java: 21 }
+          - { mc: "1.21.7",     neoforge_prefix: "21.7.",   java: 21 }
+          - { mc: "1.21.8",     neoforge_prefix: "21.8.",   java: 21 }
+          - { mc: "1.21.9",     neoforge_prefix: "21.9.",   java: 21 }
+          - { mc: "1.21.10",    neoforge_prefix: "21.10.",  java: 21 }
+          - { mc: "1.21.11",    neoforge_prefix: "21.11.",  java: 21 }
+          - { mc: "26.1.1",     neoforge_prefix: "26.1.1.", java: 25 }
+          - { mc: "26.1.2",     neoforge_prefix: "26.1.2.", java: 25 }
+          - { mc: "26.2",       neoforge_prefix: "26.2.",   java: 25 }
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: fastmapcodec-neoforge-jar
+          path: dist
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin,
+          java-version: ${{ matrix.java }}
+
+      - name: Resolve exact NeoForge version
+        id: resolve
+        run: |
+          META=$(curl -sL "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml")
+          VERSION=$(echo "$META" | grep -oP "<version>${{ matrix.neoforge_prefix }}[^<]*</version>" \
+            | sed -E 's#</?version>##g' | sort -V | tail -1)
+          if [ -z "$VERSION" ]; then
+            echo "::error::No NeoForge version found for prefix ${{ matrix.neoforge_prefix }} (mc ${{ matrix.mc }})"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved ${{ matrix.mc }} -> neoforge $VERSION"
+
+      - name: Install NeoForge server
+        run: |
+          mkdir -p server/mods
+          NF="${{ steps.resolve.outputs.version }}"
+          curl -sL "https://maven.neoforged.net/releases/net/neoforged/neoforge/$NF/neoforge-$NF-installer.jar" -o installer.jar
+          (cd server && java -jar ../installer.jar --install-server)
+          cp dist/fastmapcodec-neoforge-*.jar server/mods/
+
+      - name: Accept Mojang EULA (CI test server only, never runs persistently or accepts players)
+        run: echo "eula=true" > server/eula.txt
+
+      - name: Run server
+        run: |
+          cd server
+          timeout 60 java -Dfastmapcodec.selfTest=true -jar run.sh --nogui > /dev/null 2>&1 || true
+          cat logs/latest.log
+
+      - name: Assert expected log lines
+        run: |
+          cd server/logs
+          grep -q "FastMapCodec.*fastmapcodec" latest.log \
+            || { echo "::error::Mod not in Mod List (${{ matrix.mc }})"; exit 1; }
+          grep -qE "Successfully made module datafixerupper transformable|fastmapcodec.datafixerupper.gamelib" latest.log \
+            || { echo "::error::DFU not made transformable (${{ matrix.mc }})"; exit 1; }
+          grep -q "fastmapcodec.selfTest: patched decode\(\) path confirmed executing" latest.log \
+            || { echo "::error::Fast path never executed! (${{ matrix.mc }})"; exit 1; }
+
+  test-fabric:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: "1.21",       java: 21 }
+          - { mc: "1.21.1",     java: 21 }
+          - { mc: "1.21.2",     java: 21 }
+          - { mc: "1.21.3",     java: 21 }
+          - { mc: "1.21.4",     java: 21 }
+          - { mc: "1.21.5",     java: 21 }
+          - { mc: "1.21.7",     java: 21 }
+          - { mc: "1.21.8",     java: 21 }
+          - { mc: "1.21.9",     java: 21 }
+          - { mc: "1.21.10",    java: 21 }
+          - { mc: "1.21.11",    java: 21 }
+          - { mc: "26.1",       java: 25 }
+          - { mc: "26.1.1",     java: 25 }
+          - { mc: "26.1.2",     java: 25 }
+          - { mc: "26.2",       java: 25 }
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: fastmapcodec-fabric-jar
+          path: dist
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin,
+          java-version: ${{ matrix.java }}
+
+      - name: Install Fabric server
+        run: |
+          mkdir -p server/mods
+          curl -sL "https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.2/fabric-installer-1.1.2.jar" -o installer.jar
+          java -jar installer.jar server -dir server -mcversion "${{ matrix.mc }}" -downloadMinecraft
+          cp dist/fastmapcodec-fabric-*.jar server/mods/
+
+      - name: Accept Mojang EULA (CI test server only, never runs persistently or accepts players)
+        run: echo "eula=true" > server/eula.txt
+
+      - name: Run server
+        run: |
+          cd server
+          timeout 60 java -Dfastmapcodec.selfTest=true -jar fabric-server-launch.jar --nogui > /dev/null 2>&1 || true
+          cat logs/latest.log
+
+      - name: Assert expected log lines
+        run: |
+          cd server/logs
+          grep -q "fastmapcodec" latest.log \
+            || { echo "::error::Mod not loaded (${{ matrix.mc }})"; exit 1; }
+          grep -q "fastmapcodec.selfTest: patched decode\(\) path confirmed executing" latest.log \
+            || { echo "::error::Fast path never executed! (${{ matrix.mc }})"; exit 1; }

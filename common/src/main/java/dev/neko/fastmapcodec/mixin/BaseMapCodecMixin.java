@@ -10,9 +10,10 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
 import com.mojang.serialization.codecs.BaseMapCodec;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.List;
@@ -22,13 +23,21 @@ import java.util.stream.Stream;
 
 @Mixin(value = BaseMapCodec.class)
 public interface BaseMapCodecMixin<K, V> {
+    static final Logger LOGGER = LoggerFactory.getLogger("fastmapcodec-selftest");
+
+    private static boolean fastmapcodec$selfTestFired(int n) {
+        LOGGER.info("fastmapcodec.selfTest: patched decode() path confirmed executing (N={})", n);
+        return true; // никогда не бросает AssertionError -- только сайд-эффект логирования
+    }
+
     Codec<K> keyCodec();
 
     Codec<V> elementCodec();
 
     default <T> DataResult<Map<K, V>> decode(final DynamicOps<T> ops, final MapLike<T> input) {
-        //System.out.println("Modified BaseMapCodec.decode() is called");
         final List<Pair<T, T>> pairs = input.entries().toList();
+
+        assert fastmapcodec$selfTestFired(pairs.size());
 
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
         boolean anyDecodeFailure = false;
