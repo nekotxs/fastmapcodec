@@ -26,13 +26,12 @@ jobs:
           path: neoforge/build/libs/fastmapcodec-neoforge-*.jar
           retention-days: 3
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/upload-artifact@v7
         with:
           name: fastmapcodec-fabric-jar
           path: |
             fabric/build/libs/fastmapcodec-fabric-*.jar
             !fabric/build/libs/*-sources.jar
-          retention-days: 3
 
   test-neoforge:
     needs: build
@@ -60,12 +59,12 @@ jobs:
 
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: fastmapcodec-neoforge-jar
           path: dist
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
@@ -135,12 +134,12 @@ jobs:
           - { mc: "26.2",       java: 25 }
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: fastmapcodec-fabric-jar
           path: dist
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
