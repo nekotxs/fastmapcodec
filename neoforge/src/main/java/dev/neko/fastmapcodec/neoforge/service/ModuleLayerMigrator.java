@@ -1,10 +1,10 @@
 package dev.neko.fastmapcodec.neoforge.service;
 
-import com.mojang.logging.LogUtils;
 import cpw.mods.jarhandling.SecureJar;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -36,7 +36,7 @@ public class ModuleLayerMigrator {
     private static final VarHandle REF_MODULE_PROVIDER_FIELD = uncheck(() -> dev.neko.fastmapcodec.neoforge.service.ConnectorUtil.TRUSTED_LOOKUP.findVarHandle(JAR_MODULE_REF_CLASS, "jar", SecureJar.ModuleDataProvider.class));
     private static final VarHandle DESCRIPTOR_PACKAGES_FIELD = uncheck(() -> dev.neko.fastmapcodec.neoforge.service.ConnectorUtil.TRUSTED_LOOKUP.findVarHandle(ModuleDescriptor.class, "packages", Set.class));
     private static final MethodHandle IMPL_ADD_READS = uncheck(() -> dev.neko.fastmapcodec.neoforge.service.ConnectorUtil.TRUSTED_LOOKUP.findVirtual(Module.class, "implAddReads", MethodType.methodType(void.class, Module.class)));
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_ID);
 
     public static SecureJar moveModule(String moduleName) {
         try {

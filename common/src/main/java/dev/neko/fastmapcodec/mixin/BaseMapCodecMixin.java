@@ -10,7 +10,7 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
 import com.mojang.serialization.codecs.BaseMapCodec;
-import dev.neko.fastmapcodec.tests.TestMixinBaseMapCodec;
+import dev.neko.fastmapcodec.tests.FastMapCodecApplied;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,16 +20,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Mixin(value = BaseMapCodec.class)
-public interface BaseMapCodecMixin<K, V> {
+@Mixin(BaseMapCodec.class)
+public interface BaseMapCodecMixin<K, V> extends BaseMapCodec<K, V>, FastMapCodecApplied {
     Codec<K> keyCodec();
 
     Codec<V> elementCodec();
 
     default <T> DataResult<Map<K, V>> decode(final DynamicOps<T> ops, final MapLike<T> input) {
         final List<Pair<T, T>> pairs = input.entries().toList();
-
-        assert TestMixinBaseMapCodec.fired(pairs.size());
 
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
         boolean anyDecodeFailure = false;

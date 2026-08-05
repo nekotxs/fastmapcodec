@@ -7,12 +7,15 @@ import net.neoforged.fml.javafmlmod.FMLModContainer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import dev.neko.fastmapcodec.tests.TestMixinApplied;
+import static dev.neko.fastmapcodec.Constants.MOD_ID;
+
 @Mod("fastmapcodec")
 public class FastMapCodecNeoForge {
-    static String MOD_ID = "fastmapcodec";
     static Logger logger = LoggerFactory.getLogger(MOD_ID);
 
     public FastMapCodecNeoForge(FMLModContainer container, IEventBus modBus) {
         logger.info("FastMapCodec mod initialized");
+        TestMixinApplied.logIfApplied();
     }
 }

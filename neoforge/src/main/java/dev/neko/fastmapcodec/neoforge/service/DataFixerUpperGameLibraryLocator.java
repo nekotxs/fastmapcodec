@@ -23,7 +23,7 @@ import java.util.jar.Manifest;
  *
  */
 public class DataFixerUpperGameLibraryLocator implements IModFileCandidateLocator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataFixerUpperGameLibraryLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_ID);;
 
     @Override
     public void findCandidates(ILaunchContext context, IDiscoveryPipeline pipeline) {

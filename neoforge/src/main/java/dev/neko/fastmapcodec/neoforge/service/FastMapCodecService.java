@@ -5,19 +5,20 @@ import cpw.mods.modlauncher.api.IEnvironment;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
 import cpw.mods.modlauncher.api.ITransformationService;
 import cpw.mods.modlauncher.api.ITransformer;
-import dev.neko.fastmapcodec.neoforge.service.ModuleLayerMigrator;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+
 // makes DFU transformable on 1.21-1.21.7 using moveModule technique, borrowed from Sinytra Connector
 public class FastMapCodecService implements ITransformationService {
     private static final String NAME = "fastmapcodec_dfu_move";
     private static final String FASTMAPCODEC_MODULE = "datafixerupper";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_ID);
 
     @Override
     public String name() {

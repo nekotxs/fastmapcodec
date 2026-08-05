@@ -26,7 +26,7 @@ public class FastMapCodecModLocator implements IModFileCandidateLocator {
     private static final String MOD_JAR_PREFIX = "fastmapcodec-";
     private static final String MOD_JAR_SUFFIX = "-mod.jar";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FastMapCodecModLocator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_ID);
 
     @Override
     public void findCandidates(ILaunchContext context, IDiscoveryPipeline pipeline) {
