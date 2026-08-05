@@ -59,7 +59,7 @@ tasks.withType(JavaCompile).configureEach {
 apply plugin: "me.modmuss50.mod-publish-plugin"
 
 publishMods {
-    displayName = "FastMapCodec NeoForge ${project.mod_version}"
+    displayName = "FastMapCodec ${project.mod_version} NeoForge"
     file = tasks.named('jar').flatMap { it.archiveFile }
     changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
     type = STABLE

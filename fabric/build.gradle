@@ -61,7 +61,7 @@ jar {
 apply plugin: "me.modmuss50.mod-publish-plugin"
 
 publishMods {
-    displayName = "FastMapCodec Fabric ${project.mod_version}"
+    displayName = "FastMapCodec ${project.mod_version} Fabric"
     file = tasks.named('remapJar').flatMap { it.archiveFile }
     changelog = providers.environmentVariable("CHANGELOG").orElse("See commits for changes.")
     type = STABLE
