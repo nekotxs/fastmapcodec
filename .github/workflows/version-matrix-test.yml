@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin,
+          distribution: temurin
           java-version: ${{ matrix.java }}
 
       - name: Resolve exact NeoForge version
@@ -111,7 +111,7 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin,
+          distribution: temurin
           java-version: ${{ matrix.java }}
 
       - name: Install Fabric server
