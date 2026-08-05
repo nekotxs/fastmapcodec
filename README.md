@@ -42,6 +42,26 @@ methodology and comparison against alternatives in the bench repo linked above.
 ./gradlew fabric:build     # fabric/build/libs/
 ```
 
+## Automated testing
+
+`version-matrix-test.yml` builds the mod once and spins up real, ephemeral
+NeoForge and Fabric servers across the full supported Minecraft version range
+(1.21 through 26.2) to verify:
+
+- the mod is discovered and loads correctly on both pre- and
+  post-consolidation NeoForge loader generations
+- `datafixerupper` is successfully made transformable by Mixin
+- `BaseMapCodec` is patched
+
+Runs automatically on every push to `main` and on pull requests. Contributors
+can also trigger it manually from the Actions tab (**Version Matrix Test** →
+**Run workflow**) to check their own branch before opening a PR.
+
+By running these tests, you accept the [Minecraft EULA](https://www.minecraft.net/en-us/eula)
+on behalf of each ephemeral server they launch. These servers run for under
+two minutes, never accept player connections, and are destroyed immediately
+after each test run.
+
 ## License / attribution
 
 The `decode()` implementation adapts code from
