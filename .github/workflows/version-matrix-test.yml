@@ -88,11 +88,11 @@ jobs:
         run: |
           cd server/logs
           grep -q "FastMapCodec.*fastmapcodec" latest.log \
-            || { echo "::error::Mod not in Mod List (${{ matrix.mc }})"; exit 1; }
+            || { echo "::error::Mod not in Mod List (neoforge ${{ matrix.mc }})"; exit 1; }
           grep -qE "Successfully made module datafixerupper transformable|fastmapcodec.datafixerupper.gamelib" latest.log \
-            || { echo "::error::DFU not made transformable (${{ matrix.mc }})"; exit 1; }
+            || { echo "::error::DFU not made transformable (neoforge ${{ matrix.mc }})"; exit 1; }
           grep -q "fastmapcodec.selfTest: patched decode\(\) path confirmed executing" latest.log \
-            || { echo "::error::Fast path never executed! (${{ matrix.mc }})"; exit 1; }
+            || { echo "::error::Fast path never executed! (neoforge ${{ matrix.mc }})"; exit 1; }
 
   test-fabric:
     needs: build
@@ -134,6 +134,6 @@ jobs:
         run: |
           cd server/logs
           grep -q "fastmapcodec" latest.log \
-            || { echo "::error::Mod not loaded (${{ matrix.mc }})"; exit 1; }
+            || { echo "::error::Mod not loaded (fabric ${{ matrix.mc }})"; exit 1; }
           grep -q "fastmapcodec.selfTest: patched decode\(\) path confirmed executing" latest.log \
-            || { echo "::error::Fast path never executed! (${{ matrix.mc }})"; exit 1; }
+            || { echo "::error::Fast path never executed! (fabric ${{ matrix.mc }})"; exit 1; }

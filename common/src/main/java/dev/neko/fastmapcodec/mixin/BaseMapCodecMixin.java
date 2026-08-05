@@ -23,13 +23,6 @@ import java.util.stream.Stream;
 
 @Mixin(value = BaseMapCodec.class)
 public interface BaseMapCodecMixin<K, V> {
-    static final Logger LOGGER = LoggerFactory.getLogger("fastmapcodec-selftest");
-
-    private static boolean fastmapcodec$selfTestFired(int n) {
-        LOGGER.info("fastmapcodec.selfTest: patched decode() path confirmed executing (N={})", n);
-        return true; // никогда не бросает AssertionError -- только сайд-эффект логирования
-    }
-
     Codec<K> keyCodec();
 
     Codec<V> elementCodec();
@@ -37,7 +30,7 @@ public interface BaseMapCodecMixin<K, V> {
     default <T> DataResult<Map<K, V>> decode(final DynamicOps<T> ops, final MapLike<T> input) {
         final List<Pair<T, T>> pairs = input.entries().toList();
 
-        assert fastmapcodec$selfTestFired(pairs.size());
+        assert TestMixinBaseMapCodec.fired(pairs.size());
 
         final ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
         boolean anyDecodeFailure = false;
