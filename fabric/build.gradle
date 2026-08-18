@@ -34,11 +34,13 @@ dependencies {
 }
 
 processResources {
-    def version = project.mod_version
-    inputs.property "version", version
-
+    def props = [
+            "version": project.mod_version,
+            "loader_version": project.loader_version
+    ]
+    inputs.properties(props)
     filesMatching("fabric.mod.json") {
-        expand "version": version
+        expand(props)
     }
 }
 

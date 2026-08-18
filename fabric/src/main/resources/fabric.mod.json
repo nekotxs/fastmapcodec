@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "fastmapcodec",
-  "version": "1.0.0",
+  "version": "${version}",
   "name": "FastMapCodec",
   "description": "Fixes O(n^2) in BaseMapCodec.decode (TPS freezes on player join mainly)",
   "authors": ["neko"],
@@ -16,7 +16,7 @@
     "fastmapcodec.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.0",
+    "fabricloader": ">=${loader_version}",
     "minecraft": ">=1.21",
     "java": ">=21"
   }
