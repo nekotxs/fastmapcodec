@@ -10,7 +10,7 @@ public class FastMapCodecFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("FastMapCodec mod initialized");
         TestMixinApplied.logIfApplied();
+        LOGGER.info("FastMapCodec mod initialized");
     }
 }

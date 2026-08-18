@@ -15,7 +15,7 @@ public class FastMapCodecNeoForge {
     static Logger logger = LoggerFactory.getLogger(MOD_ID);
 
     public FastMapCodecNeoForge(FMLModContainer container, IEventBus modBus) {
-        logger.info("FastMapCodec mod initialized");
         TestMixinApplied.logIfApplied();
+        logger.info("FastMapCodec mod initialized");
     }
 }
